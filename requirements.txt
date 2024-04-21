@@ -8,3 +8,8 @@ pandas
 numpy
 python-dotenv
 langchain-pinecone
+streamlit
+google-generativeai
+faiss-cpu
+langchain_google_genai
+PyPDF2
