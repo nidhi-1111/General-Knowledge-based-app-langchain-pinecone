@@ -1,9 +1,11 @@
 ## Langchain imports
 import langchain
-from langchain.document_loaders import PyPDFDirectoryLoader
+# from langchain.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+# from langchain.llms import Runnable
+
 
 ## Pinecone imports
 import pinecone
@@ -12,13 +14,13 @@ from langchain_pinecone import PineconeVectorStore
 ## OpenAI imports 
 import openai
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.llms import OpenAI
-from langchain import OpenAI
+# from langchain.llms import OpenAI
+# from langchain import OpenAI
 
 ## Gemini pro imports
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import google.generativeai as genai
-from langchain.vectorstores import faiss
+# from langchain.vectorstores import faiss
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 import os
@@ -26,6 +28,7 @@ import tempfile
 import streamlit as st
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -69,10 +72,15 @@ def get_conversational_chain():
 
     Answer:
     """
-    model = ChatGoogleGenerativeAI(model='gemini-pro', temperature=0.5, request_timeout=120)
+    # model = genai.GenerativeModel('gemini-pro')
+    model = ChatGoogleGenerativeAI(model='gemini-pro', temperature=0.5)
     prompt = PromptTemplate(template=prompt_template, input_variables=['context','question'])
+    print("Here is the prompt : ", prompt)
     chain = load_qa_chain(model, chain_type='stuff',prompt=prompt)
+    print("Here is the chain : ", chain)
+    print("Here is the type of the chain ", type(chain))
     return chain
+
 
 def user_input(user_question,text_chunks):
     db = get_vector_store(text_chunks)
