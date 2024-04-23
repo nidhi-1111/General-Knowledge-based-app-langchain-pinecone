@@ -2,7 +2,7 @@ import requests
 
 url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro'
 headers = {
-    'Authorization': 'AIzaSyBOi1I4kjQTaan1_HnOGwl_r9P6QmtPwOA'  # Replace with your API key
+    'Authorization': 'your api key'  # Replace with your API key
 }
 
 try:
