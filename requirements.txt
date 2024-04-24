@@ -1,15 +1,35 @@
-unstructured
-tiktoken
-pinecone-client
-pypdf
-openai
-langchain
-pandas 
-numpy
+# unstructured
+# tiktoken
+# pinecone-client
+# pypdf
+# openai
+# langchain
+# pandas 
+# numpy
+# python-dotenv
+# langchain-pinecone
+# streamlit
+# google-generativeai
+# faiss-cpu
+# langchain_google_genai
+# PyPDF2
+langchain_openai 
+langchain_core
 python-dotenv
-langchain-pinecone
 streamlit
-google-generativeai
+langchain_community
+langserve
+fastapi
+uvicorn
+sse_starlette
+bs4
+pypdf
+chromadb
 faiss-cpu
-langchain_google_genai
-PyPDF2
+groq
+cassio
+beautifulsoup4
+langchain-groq
+wikipedia
+arxiv
+langchainhub
