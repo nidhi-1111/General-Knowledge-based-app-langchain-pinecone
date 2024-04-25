@@ -16,7 +16,8 @@ groq
 cassio
 langchain-groq
 langchainhub
-
+beautifulsoup4
+bs4
 
 # unstructured
 # tiktoken
@@ -28,7 +29,6 @@ langchainhub
 # python-dotenv
 # google-generativeai
 # langchain-pinecone
-# beautifulsoup4
-# bs4
+
 # wikipedia
 # arxiv
