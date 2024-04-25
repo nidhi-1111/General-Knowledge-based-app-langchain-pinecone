@@ -20,7 +20,7 @@ load_dotenv()
 # groq_api_key = os.getenv('GROQ_API_KEY')
 # google_api_key = os.getenv('GOOGLE_API_KEY')
 
-st.title("Ask questions from your pdf(s) or website")
+st.title("Ask questions from your PDF(s) or website")
 option = None
 
 # Prompt user to choose between PDFs or website
