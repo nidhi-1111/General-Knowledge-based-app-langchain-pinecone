@@ -17,14 +17,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ## Load the Groq API key
-groq_api_key = os.environ['GROQ_API_KEY']
-google_api_key = os.environ['GOOGLE_API_KEY']
+# groq_api_key = os.getenv('GROQ_API_KEY')
+# google_api_key = os.getenv('GOOGLE_API_KEY')
 
-st.title("Chat with Groq and Mixtral")
+st.title("Ask your questions from pdf(s) or website")
 option = None
 
 # Prompt user to choose between PDFs or website
-option = st.radio("Choose input type:", ("Multiple PDFs", "Single Website"), index=None)
+option = st.radio("Choose input type:", ("PDF(s)", "Website"), index=None)
 
 
 def get_pdf_processed(pdf_docs):
@@ -36,7 +36,7 @@ def get_pdf_processed(pdf_docs):
     return text
 
 def llm_model():
-    llm = ChatGroq(groq_api_key=groq_api_key, model="mixtral-8x7b-32768")
+    llm = ChatGroq(model="mixtral-8x7b-32768",groq_api_key=st.secrets['GROQ_API_KEY'])
     prompt = ChatPromptTemplate.from_template(
     """
     Answer the question based on the provided context only.
@@ -51,7 +51,7 @@ def llm_model():
     retriever = st.session_state.vector.as_retriever() if st.session_state.vector else None
     retrieval_chain = create_retrieval_chain(retriever,document_chain)
 
-    prompt = st.text_input("Input your prompt here")
+    prompt = st.text_input("Input your question here")
 
     if prompt:
 
@@ -60,11 +60,11 @@ def llm_model():
         print("Response time :", time.process_time()-start)
         st.write(response['answer'])
 
-st.session_state.embeddings =GoogleGenerativeAIEmbeddings(model = 'models/embedding-001',google_api_key=google_api_key)
+st.session_state.embeddings =GoogleGenerativeAIEmbeddings(model = 'models/embedding-001',google_api_key=st.secrets['GOOGLE_API_KEY'])
 st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size =1000, chunk_overlap= 200)
 
 if option:
-    if option == "Single Website":
+    if option == "Website":
         website_link = st.text_input("Enter the website link:")
         if website_link:
             st.session_state.loader = WebBaseLoader(website_link)
@@ -73,8 +73,8 @@ if option:
             st.session_state.vector = FAISS.from_documents(st.session_state.final_documents,st.session_state.embeddings)
             llm_model()
 
-    elif option == "Multiple PDFs":
-        pdf_files = st.file_uploader("Upload multiple PDF files", type=["pdf"], accept_multiple_files=True)
+    elif option == "PDF(s)":
+        pdf_files = st.file_uploader("Upload your PDF files", type=["pdf"], accept_multiple_files=True)
         if pdf_files:
             st.session_state.docs = get_pdf_processed(pdf_files)
             st.session_state.final_documents = st.session_state.text_splitter.split_text(st.session_state.docs)
