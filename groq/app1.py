@@ -2,12 +2,15 @@ import streamlit as st
 import os
 from langchain_groq import ChatGroq 
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
+from sentence_transformers import SentenceTransformer
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
-from langchain_pinecone import PineconeVectorStore
+from langchain_community.vectorstores.faiss import FAISS
+from faiss import IndexIVFFlat, IndexIVFPQ
 
 import time
 from PyPDF2 import PdfReader
@@ -18,9 +21,8 @@ import psutil
 import os
 import pdfplumber
 
-## Load the API keys
+## Load the Groq API key
 groq_api_key = os.getenv('GROQ_API_KEY')
-pinecone_api_key = os.getenv('PINECONE_API_KEY')
 
 # google_api_key = os.getenv('GOOGLE_API_KEY')
 # neo4j_uri = os.getenv('NEO4J_URI')
@@ -34,6 +36,15 @@ option = None
 
 # Prompt user to choose between PDFs or website
 option = st.radio("Choose input type:", ("PDF(s)", "Website"), index=None)
+
+
+# def get_pdf_processed(pdf_docs):
+#     text=""
+#     for pdf in pdf_docs:
+#         pdf_reader= PdfReader(pdf)
+#         for page in pdf_reader.pages:
+#             text += page.extract_text()
+#     return text
 
 def get_pdf_processed(pdf_docs):
     text = ""
@@ -71,65 +82,34 @@ def llm_model():
 
 # st.session_state.embeddings =GoogleGenerativeAIEmbeddings(model = 'models/embedding-001',google_api_key=st.secrets['GOOGLE_API_KEY'])
 model_name = "all-MiniLM-L6-v2"
-st.session_state.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+st.session_state.embeddings = SentenceTransformer(model_name)
 
 st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size =1000, chunk_overlap= 200)
-
-index_name = "myindex"
-vectorstore = PineconeVectorStore(index_name=index_name, embedding=st.session_state.embeddings)
-
-if "pdf_loaded" not in st.session_state:
-    st.session_state.pdf_loaded = False
-
-if "website_loaded" not in st.session_state:
-    st.session_state.website_loaded = False
 
 if option:
     if option == "Website":
         website_link = st.text_input("Enter the website link:")
         if website_link:
-            if not st.session_state.website_loaded:
-                with st.spinner("Loading website content..."):
-                    st.session_state.loader = WebBaseLoader(website_link)
-                    st.session_state.docs = st.session_state.loader.load()
-                    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
-                    st.session_state.vector = PineconeVectorStore.from_documents(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings)
-                    st.session_state.website_loaded = True
+            with st.spinner("Loading website content..."):
+                st.session_state.loader = WebBaseLoader(website_link)
+                st.session_state.docs = st.session_state.loader.load()
+                st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
+                st.session_state.vector = FAISS.from_documents(st.session_state.final_documents,st.session_state.embeddings)
                 st.success("Done!")
             llm_model()
             
     elif option == "PDF(s)":
         pdf_files = st.file_uploader("Upload your PDF files", type=["pdf"], accept_multiple_files=True)
         if pdf_files:
-            if not st.session_state.pdf_loaded:
-                with st.spinner("Loading pdf..."):
-                    st.session_state.docs = get_pdf_processed(pdf_files)
-                    st.session_state.final_documents = st.session_state.text_splitter.split_text(st.session_state.docs)
-                    st.session_state.vector = PineconeVectorStore.from_texts(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings) 
-                    st.session_state.pdf_loaded = True
-                    st.success("Done!")
+            with st.spinner("Loading pdf..."):
+                st.session_state.docs = get_pdf_processed(pdf_files)
+                st.session_state.final_documents = st.session_state.text_splitter.split_text(st.session_state.docs)
+                index = IndexIVFPQ(st.session_state.embeddings.dim, nlist=100, m=16, nbits=8)
+                st.session_state.vector = FAISS.from_texts(st.session_state.final_documents,st.session_state.embeddings, index=index)
+                st.success("Done!")
             llm_model()
 
             
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         # with st.expander("Not the expected answer? Find the different one here"):
         #     for i, doc in enumerate(response['context']):
@@ -137,8 +117,4 @@ if option:
         #         st.write("-----------------------------")
 
         
-# from langchain_community.vectorstores.faiss import FAISS
-# from langchain.vectorstores import Pinecone
-# from langchain_community.embeddings import OllamaEmbeddings
-# from sentence_transformers import SentenceTransformer
-# from langchain_google_genai import GoogleGenerativeAIEmbeddings
+

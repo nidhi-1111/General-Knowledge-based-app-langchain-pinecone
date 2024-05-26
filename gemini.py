@@ -1,5 +1,7 @@
 ## Langchain imports
 import langchain
+from langchain_groq import ChatGroq
+
 # from langchain.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.question_answering import load_qa_chain
@@ -32,6 +34,13 @@ import time
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+groq_api_key = os.getenv('GROQ_API_KEY')
+neo4j_uri = os.getenv('NEO4J_URI')
+neo4j_username = os.getenv('NEO4J_USERNAME')
+neo4j_pass = os.getenv('NEO4J_PASSWORD')
+# graph = Neo4jGraph()
+
+
 
 # Read the documents 
 

@@ -1,6 +1,6 @@
 langchain
 streamlit
-faiss-cpu
+faiss-cpu 
 langchain_google_genai
 PyPDF2
 langchain_openai 
@@ -18,7 +18,8 @@ langchain-groq
 langchainhub
 beautifulsoup4
 bs4
-
+sentence-transformers
+pdfplumber
 # unstructured
 # tiktoken
 # pinecone-client
