@@ -76,39 +76,39 @@ st.session_state.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2
 st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size =1000, chunk_overlap= 200)
 
 index_name = "myindex"
-vectorstore = PineconeVectorStore(index_name=index_name, embedding=st.session_state.embeddings)
+st.session_state.vector = PineconeVectorStore(index_name=index_name, embedding=st.session_state.embeddings)
 
-if "pdf_loaded" not in st.session_state:
-    st.session_state.pdf_loaded = False
+# if "pdf_loaded" not in st.session_state:
+#     st.session_state.pdf_loaded = False
 
-if "website_loaded" not in st.session_state:
-    st.session_state.website_loaded = False
+# if "website_loaded" not in st.session_state:
+#     st.session_state.website_loaded = False
 
 if option:
     if option == "Website":
         website_link = st.text_input("Enter the website link:")
         if website_link:
-            if not st.session_state.website_loaded:
-                with st.spinner("Loading website content..."):
-                    st.session_state.loader = WebBaseLoader(website_link)
-                    st.session_state.docs = st.session_state.loader.load()
-                    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
-                    st.session_state.vector = PineconeVectorStore.from_documents(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings)
-                    st.session_state.website_loaded = True
-                st.success("Done!")
-            llm_model()
+            # if not st.session_state.website_loaded:
+            with st.spinner("Loading website content..."):
+                st.session_state.loader = WebBaseLoader(website_link)
+                st.session_state.docs = st.session_state.loader.load()
+                st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
+                st.session_state.vector = PineconeVectorStore.from_documents(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings)
+                # st.session_state.website_loaded = True
+            st.success("Done!")
+        llm_model()
             
     elif option == "PDF(s)":
         pdf_files = st.file_uploader("Upload your PDF files", type=["pdf"], accept_multiple_files=True)
         if pdf_files:
-            if not st.session_state.pdf_loaded:
-                with st.spinner("Loading pdf..."):
-                    st.session_state.docs = get_pdf_processed(pdf_files)
-                    st.session_state.final_documents = st.session_state.text_splitter.split_text(st.session_state.docs)
-                    st.session_state.vector = PineconeVectorStore.from_texts(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings) 
-                    st.session_state.pdf_loaded = True
-                    st.success("Done!")
-            llm_model()
+            # if not st.session_state.pdf_loaded:
+            with st.spinner("Loading pdf..."):
+                st.session_state.docs = get_pdf_processed(pdf_files)
+                st.session_state.final_documents = st.session_state.text_splitter.split_text(st.session_state.docs)
+                st.session_state.vector = PineconeVectorStore.from_texts(st.session_state.final_documents, index_name=index_name, embedding = st.session_state.embeddings) 
+                # st.session_state.pdf_loaded = True
+                st.success("Done!")
+        llm_model()
 
             
 
