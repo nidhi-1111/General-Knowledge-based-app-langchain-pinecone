@@ -20,6 +20,7 @@ beautifulsoup4
 bs4
 sentence-transformers
 pdfplumber
+langchain-pinecone
 # unstructured
 # tiktoken
 # pinecone-client
