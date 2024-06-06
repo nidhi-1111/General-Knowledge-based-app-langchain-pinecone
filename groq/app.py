@@ -43,6 +43,7 @@ def get_vector_store(text_chunks):
 
     # Create a new Pinecone index or retrieve an existing one
     index_name = "chatindex"
+
     if index_name in pc.list_indexes().names():
         pc.delete_index(index_name)
 
@@ -77,17 +78,15 @@ def user_input(user_question):
     pc = Pinecone(api_key = pinecone_api_key)
     vector_store = langpinecone.from_existing_index(index_name, embeddings)
 
+    docs = vector_store.similarity_search(user_question, k=20)
     # Search and retrieve relevant documents
-    docs = vector_store.similarity_search(user_question)
 
     chain = get_conversational_chain()
 
-    
     response = chain(
         {"input_documents":docs, "question": user_question}
         , return_only_outputs=True)
 
-    print(response)
     st.write("Reply: ", response["output_text"])
 
 
