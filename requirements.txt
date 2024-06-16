@@ -21,6 +21,16 @@ bs4
 sentence-transformers
 pdfplumber
 langchain-pinecone
+langchain-experimental
+neo4j
+yfiles_jupyter_graphs
+wikipedia
+selenium
+unstructured
+
+
+
+
 # unstructured
 # tiktoken
 # pinecone-client

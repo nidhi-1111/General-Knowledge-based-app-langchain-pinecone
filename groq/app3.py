@@ -16,9 +16,24 @@ from langchain_groq import ChatGroq
 from pinecone import Pinecone, ServerlessSpec
 from langchain.vectorstores import Pinecone as langpinecone
 
+## neo4j
+from langchain_community.graphs import Neo4jGraph
+from langchain_experimental.graph_transformers import LLMGraphTransformer
+from neo4j import GraphDatabase
+from yfiles_jupyter_graphs import GraphWidget
+from langchain_community.vectorstores import Neo4jVector
+from langchain_community.vectorstores.neo4j_vector import remove_lucene_chars
+
 load_dotenv()
 groq_api_key = os.getenv('GROQ_API_KEY')
 pinecone_api_key = os.getenv('PINECONE_API_KEY')
+
+# # google_api_key = os.getenv('GOOGLE_API_KEY')
+# neo4j_uri = os.getenv('NEO4J_URI')
+# neo4j_username = os.getenv('NEO4J_USERNAME')
+# neo4j_pass = os.getenv('NEO4J_PASSWORD')
+# graph = Neo4jGraph()
+
 
 def get_pdf_text(pdf_docs):
     text=""
@@ -64,8 +79,7 @@ def get_conversational_chain():
     Answer:
     """
 
-    model = ChatGroq(model="mixtral-8x7b-32768",groq_api_key=groq_api_key)
-
+    model = ChatGroq(model="mixtral-8x7b-32768",groq_api_key=groq_api_key)    
     prompt = PromptTemplate(template = prompt_template, input_variables = ["context", "question"])
     chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
 
